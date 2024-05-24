@@ -7,6 +7,7 @@ const montserrat = Montserrat({ subsets: ["latin"] });
 export const metadata = {
   title: "Joy AI",
   description: "Discover the Joy of AI: Empowering Tomorrow, Today.",
+  keywords: "Joy, Joy AI, ai",
   icons: {
     icon: [
       "/images/icons/joy-ai-icon.png"
