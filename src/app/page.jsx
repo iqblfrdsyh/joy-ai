@@ -135,7 +135,7 @@ const Home = () => {
   };
 
   return (
-    <section className="relative pt-20">
+    <section className="relative pt-[60px]">
       {history.length > 0 ? (
         <ScrollShadow
           ref={scrollRef}
