@@ -141,7 +141,7 @@ const Home = () => {
           ref={scrollRef}
           size={20}
           hideScrollBar
-          className="w-[93%] h-[77vh] mx-auto sm:w-[70%] sm:h-[78vh] relative"
+          className="w-[93%] h-[72vh] mx-auto sm:w-[70%] sm:h-[78vh] relative"
         >
           {renderHistory()}
         </ScrollShadow>
