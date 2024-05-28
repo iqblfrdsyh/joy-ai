@@ -1,31 +1,33 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState, useRef } from "react";
 import BoxQuestion from "@/components/boxQuestion";
 import ContainerAnswer from "@/components/containerAnswer";
 import InputQuestion from "@/components/inputQuestion";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { motion } from "framer-motion";
-import SkeletonLoading from "@/components/skeleton";
+import LoadingBolt from "@/components/loadingIcon";
 
 const Home = () => {
-  const [data, setData] = useState("");
   const [loading, setLoading] = useState(false);
-  const [isQuestion, setIsQuestion] = useState(false);
-
-  useEffect(() => {
-    setIsQuestion(false);
-    localStorage.removeItem("user_question");
-  }, []);
+  const [history, setHistory] = useState([]);
+  const scrollRef = useRef(null);
+  const inputContent = useRef(null);
+  const latestQuestionRef = useRef(null);
 
   const handleClick = async () => {
-    const question =
-      inputContent.value.trim() || localStorage.getItem("user_question");
+    const question = inputContent.current.value.trim();
 
     if (!question) return;
-    localStorage.setItem("user_question", question);
-    setIsQuestion(true);
-    inputContent.value = "";
+
+    inputContent.current.value = "";
+
+    const newEntry = { question, answer: "", loading: true };
+    setHistory((prevHistory) => [...prevHistory, newEntry]);
+
+    setTimeout(() => {
+      scrollToBottom();
+    }, 150);
 
     setLoading(true);
 
@@ -45,12 +47,25 @@ const Home = () => {
       const responseData = await response.json();
       const { choices } = responseData.body;
       if (choices && choices.length > 0) {
-        setData(choices[0].message.content);
+        const answer = choices[0].message.content;
+        newEntry.answer = answer;
+        newEntry.loading = false;
+        setHistory((prevHistory) => {
+          const updatedHistory = [...prevHistory];
+          updatedHistory[updatedHistory.length - 1] = newEntry;
+          return updatedHistory;
+        });
       } else {
         throw new Error("No data found");
       }
     } catch (error) {
-      console.error("Error:", error.message);
+      newEntry.answer = "Error fetching response.";
+      newEntry.loading = false;
+      setHistory((prevHistory) => {
+        const updatedHistory = [...prevHistory];
+        updatedHistory[updatedHistory.length - 1] = newEntry;
+        return updatedHistory;
+      });
     } finally {
       setLoading(false);
     }
@@ -63,60 +78,85 @@ const Home = () => {
   };
 
   const handleQuestionClick = (question) => {
-    localStorage.setItem("user_question", question);
-    setIsQuestion(true);
+    inputContent.current.value = question;
     handleClick();
   };
 
-  return (
-    <React.Fragment>
-      <section className="relative pt-20">
-        {isQuestion && (
-          <div className="mb-6 bg-[#FFFFFF4D] py-2 px-3 rounded-lg w-[93%] sm:w-[70%] mx-auto">
-            <h4>{localStorage.getItem("user_question") || ""}</h4>
+  const scrollToBottom = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  };
+
+  const renderHistory = () =>
+    history.map((entry, index) => (
+      <div key={index} className="mb-4">
+        <div
+          className="flex justify-end"
+          ref={index === history.length - 1 ? latestQuestionRef : null}
+        >
+          <div className="mb-2 bg-[#FFFFFF4D] py-2 px-3 rounded-b-xl rounded-tl-xl text-right inline-block min-w-[fit-content]">
+            <h4>{entry.question}</h4>
           </div>
-        )}
-        {data ? (
-          <ScrollShadow
-            className="w-[93%] h-[450px] mt-6 mx-auto sm:w-[70%] sm:h-[480px]"
-            size={20}
-            hideScrollBar
-          >
-            {loading ? <SkeletonLoading /> : <ContainerAnswer text={data} />}
-          </ScrollShadow>
+        </div>
+        {entry.loading ? (
+          <LoadingBolt />
         ) : (
-          <>
-            {loading ? (
-              <SkeletonLoading />
-            ) : (
-              <>
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
-                  className="text-center mt-7"
-                >
-                  <h2 className="gradient-text text-[45px] font-semibold">
-                    Hello User
-                  </h2>
-                  <p className="text-[20px] font-semibold opacity-50">
-                    How Can I Help You Today?
-                  </p>
-                </motion.div>
-
-                <div className="flex flex-col h-[50vh] justify-center">
-                  <BoxQuestion onQuestionClick={handleQuestionClick} />
-                </div>
-              </>
-            )}
-          </>
+          <ContainerAnswer text={entry.answer} />
         )}
+      </div>
+    ));
 
-        <form onSubmit={(e) => e.preventDefault()}>
-          <InputQuestion onClick={handleClick} onKeyDown={handleKeyDown} />
-        </form>
-      </section>
-    </React.Fragment>
+  const renderContent = () => {
+    return (
+      <>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="text-center mt-7"
+        >
+          <h2 className="gradient-text text-[45px] font-semibold">
+            Hello User
+          </h2>
+          <p className="text-[20px] font-semibold opacity-50">
+            How Can I Help You Today?
+          </p>
+        </motion.div>
+
+        <div className="flex flex-col h-[50vh] justify-center">
+          <BoxQuestion
+            questions={["Question 1", "Question 2", "Question 3"]}
+            onQuestionClick={handleQuestionClick}
+          />
+        </div>
+      </>
+    );
+  };
+
+  return (
+    <section className="relative pt-20">
+      {history.length > 0 ? (
+        <ScrollShadow
+          ref={scrollRef}
+          size={20}
+          hideScrollBar
+          className="w-[93%] h-[77vh] mx-auto sm:w-[70%] sm:h-[78vh] relative"
+        >
+          {renderHistory()}
+        </ScrollShadow>
+      ) : (
+        renderContent()
+      )}
+      <form onSubmit={(e) => e.preventDefault()}>
+        <InputQuestion
+          ref={inputContent}
+          onClick={handleClick}
+          onKeyDown={handleKeyDown}
+          isSubmitted={loading}
+        />
+      </form>
+    </section>
   );
 };
 
