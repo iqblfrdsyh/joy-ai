@@ -125,10 +125,7 @@ const Home = () => {
         </motion.div>
 
         <div className="flex flex-col h-[50vh] justify-center">
-          <BoxQuestion
-            questions={["Question 1", "Question 2", "Question 3"]}
-            onQuestionClick={handleQuestionClick}
-          />
+          <BoxQuestion onQuestionClick={handleQuestionClick} />
         </div>
       </>
     );
@@ -141,7 +138,7 @@ const Home = () => {
           ref={scrollRef}
           size={20}
           hideScrollBar
-          className="w-[93%] h-[72vh] mx-auto sm:w-[70%] sm:h-[78vh] relative"
+          className="w-[93%] mt-[5px] h-[72vh] mx-auto sm:w-[70%] sm:h-[78vh] sm:mt-[20px] relative"
         >
           {renderHistory()}
         </ScrollShadow>
