@@ -7,6 +7,8 @@ import InputQuestion from "@/components/inputQuestion";
 import { ScrollShadow } from "@nextui-org/scroll-shadow";
 import { motion } from "framer-motion";
 import LoadingBolt from "@/components/loadingIcon";
+import { runAI } from "@/libs/api-libs";
+import useAIModel from "@/store/useModelAI";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
@@ -14,6 +16,8 @@ const Home = () => {
   const scrollRef = useRef(null);
   const inputContent = useRef(null);
   const latestQuestionRef = useRef(null);
+
+  const AIModel = useAIModel((state) => state.AIModel);
 
   const handleClick = async () => {
     const question = inputContent.current.value.trim();
@@ -32,20 +36,9 @@ const Home = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ content: question }),
-      });
+      const response = await runAI(AIModel, question);
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch");
-      }
-
-      const responseData = await response.json();
-      const { choices } = responseData.body;
+      const { choices } = response.data.body;
       if (choices && choices.length > 0) {
         const answer = choices[0].message.content;
         newEntry.answer = answer;
@@ -132,7 +125,7 @@ const Home = () => {
   };
 
   return (
-    <section className="relative pt-[60px]">
+    <section className="relative pt-[65px]">
       {history.length > 0 ? (
         <ScrollShadow
           ref={scrollRef}
