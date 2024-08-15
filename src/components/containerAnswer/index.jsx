@@ -4,7 +4,7 @@ import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 const CodeBlock = ({ value }) => (
   <SyntaxHighlighter
-    language="jsx"
+    language="javascript"
     style={atomOneDark}
     wrapLongLines={true}
     customStyle={{ padding: "25px" }}

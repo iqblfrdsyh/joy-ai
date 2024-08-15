@@ -28,7 +28,6 @@ const Home = () => {
     inputContent.current.value = "";
 
     const newEntry = { question, answer: "", loading: true };
-    console.log({ history });
     setHistory((prevHistory) => [...prevHistory, newEntry]);
 
     setTimeout(() => {

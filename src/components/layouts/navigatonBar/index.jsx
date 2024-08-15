@@ -28,18 +28,18 @@ const NavigationBar = () => {
             height={30}
           />
         </figure>
-        <div className="flex gap-2 ml-2">
+        <div className="flex gap-1 ml-2">
           <h1 className="text-[22px] font-semibold">Joy AI</h1>
-          <span className="text-[12px] text-right font-light text-gray-400">
+          <span className="text-[11px] text-right font-semibold text-gray-400">
             v2.2.1
           </span>
         </div>
       </Link>
-      <div className="w-[165px]">
+      <div className="w-[165px] flex justify-end me-2">
         <Select
           placeholder="Select AI Model"
           defaultSelectedKeys={[1]}
-          className="w-full"
+          className="w-[145px]"
           variant="underlined"
           color="warning"
           aria-labelledby="AI Model"
@@ -49,7 +49,7 @@ const NavigationBar = () => {
             <SelectItem
               key={model.id}
               value={model.name}
-              className="text-black"
+              className="text-black w-[250px]"
             >
               {model.name}
             </SelectItem>

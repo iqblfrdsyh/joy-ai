@@ -9,7 +9,7 @@ async function requestGeminiAI(model, prompt, history) {
     history,
   });
 
-  let result = await chat.sendMessageStream(prompt);
+  let result = await chat.sendMessage(prompt);
 
   const response = await result.response;
   const text = response.text();
