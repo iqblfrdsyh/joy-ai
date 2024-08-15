@@ -13,6 +13,7 @@ import useAIModel from "@/store/useModelAI";
 const Home = () => {
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
+  const [historyGemini, setHistoryGemini] = useState([]);
   const scrollRef = useRef(null);
   const inputContent = useRef(null);
   const latestQuestionRef = useRef(null);
@@ -27,6 +28,7 @@ const Home = () => {
     inputContent.current.value = "";
 
     const newEntry = { question, answer: "", loading: true };
+    console.log({ history });
     setHistory((prevHistory) => [...prevHistory, newEntry]);
 
     setTimeout(() => {
@@ -36,9 +38,11 @@ const Home = () => {
     setLoading(true);
 
     try {
-      const response = await runAI(AIModel, question);
+      const response = await runAI(AIModel, question, historyGemini);
 
       const { choices } = response.data.body;
+
+      console.log(response);
       if (choices && choices.length > 0) {
         const answer = choices[0].message.content;
         newEntry.answer = answer;
@@ -48,11 +52,18 @@ const Home = () => {
           updatedHistory[updatedHistory.length - 1] = newEntry;
           return updatedHistory;
         });
+        if (AIModel.toLowerCase().startsWith("gemini")) {
+          setHistoryGemini([
+            ...historyGemini,
+            { role: "user", parts: [{ text: question }] },
+            { role: "model", parts: [{ text: answer }] },
+          ]);
+        }
       } else {
         throw new Error("No data found");
       }
     } catch (error) {
-      newEntry.answer = "Error fetching response.";
+      newEntry.answer = `${error.message}, Please type again.`;
       newEntry.loading = false;
       setHistory((prevHistory) => {
         const updatedHistory = [...prevHistory];

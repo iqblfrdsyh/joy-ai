@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 const useAIModel = create((set) => ({
-  AIModel: "llama3-8b-8192",
+  AIModel: "gemini-1.5-flash",
   switchAIModel: (model) => set(() => ({ AIModel: model })),
 }));
 

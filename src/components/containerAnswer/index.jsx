@@ -21,28 +21,35 @@ const TextWithCode = ({ text }) => {
   const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
 
   const formatInlineCodeAndBold = (text) => {
-    let formattedText = [];
+    const formattedText = [];
     let lastIndex = 0;
     let match;
 
     while ((match = linkRegex.exec(text)) !== null) {
       const beforeMatch = text.substring(lastIndex, match.index);
-      if (beforeMatch) {
-        formattedText.push(beforeMatch);
-      }
+      if (beforeMatch) formattedText.push(beforeMatch);
+
       if (match[1] && match[2]) {
         formattedText.push(
-          <a key={`link-${match.index}`} href={match[2]} target="_blank" rel="noopener noreferrer" className="underline text-blue-400">
+          <a
+            key={`link-${match.index}`}
+            href={match[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline text-blue-400"
+          >
             {match[1]}
           </a>
         );
       }
+
       lastIndex = linkRegex.lastIndex;
     }
+
     const remainingText = text.substring(lastIndex);
     formattedText.push(remainingText);
 
-    formattedText = formattedText.map((part, index) => {
+    return formattedText.map((part, index) => {
       if (typeof part === "string") {
         const boldFormatted = [];
         let lastBoldIndex = 0;
@@ -50,9 +57,8 @@ const TextWithCode = ({ text }) => {
 
         while ((boldMatch = boldTextRegex.exec(part)) !== null) {
           const beforeBoldMatch = part.substring(lastBoldIndex, boldMatch.index);
-          if (beforeBoldMatch) {
-            boldFormatted.push(beforeBoldMatch);
-          }
+          if (beforeBoldMatch) boldFormatted.push(beforeBoldMatch);
+
           if (boldMatch[1]) {
             boldFormatted.push(
               <span key={`bold-${boldMatch.index}`} style={{ fontWeight: "bold" }}>
@@ -60,47 +66,46 @@ const TextWithCode = ({ text }) => {
               </span>
             );
           }
+
           lastBoldIndex = boldTextRegex.lastIndex;
         }
 
         const remainingBoldText = part.substring(lastBoldIndex);
         boldFormatted.push(remainingBoldText);
 
-        const inlineFormatted = boldFormatted.map((boldPart, boldIndex) => {
+        return boldFormatted.map((boldPart, boldIndex) => {
           if (typeof boldPart === "string") {
             const parts = boldPart.split(inlineCodeRegex).map((subPart, subIndex) => {
               if (subIndex % 2 === 1) {
                 return <code key={`inline-${index}-${subIndex}`}>{subPart}</code>;
-              } else {
-                return subPart;
               }
+              return subPart;
             });
-            return <React.Fragment key={`${index}-${boldIndex}`}>{parts}</React.Fragment>;
+
+            return (
+              <React.Fragment key={`${index}-${boldIndex}`}>
+                {parts}
+              </React.Fragment>
+            );
           }
           return boldPart;
         });
-
-        return <React.Fragment key={index}>{inlineFormatted}</React.Fragment>;
       }
       return part;
     });
-
-    return formattedText;
   };
 
   const formatText = (text) => {
-    let replacedText = text.replace(/^\* /gm, "- ");
-    replacedText = replacedText.replace(/\*{4}$/gm, "**");
+    const replacedText = text.replace(/^\* /gm, "- ").replace(/\*{4}$/gm, "**");
     return replacedText.split("\n").map((paragraph, index) => {
       if (paragraph.trim().startsWith("```")) {
         return <CodeBlock key={index} value={paragraph} />;
-      } else {
-        return (
-          <p key={index} className="my-3">
-            {formatInlineCodeAndBold(paragraph)}
-          </p>
-        );
       }
+      return (
+        <p key={index} className="my-3">
+          {formatInlineCodeAndBold(paragraph)}
+        </p>
+      );
     });
   };
 
@@ -109,20 +114,17 @@ const TextWithCode = ({ text }) => {
       {text.split(codeBlockRegex).map((part, index) => {
         if (index % 2 === 0) {
           return <div key={`part-${index}`}>{formatText(part)}</div>;
-        } else {
-          return <CodeBlock key={`code-${index}`} value={part} />;
         }
+        return <CodeBlock key={`code-${index}`} value={part} />;
       })}
     </div>
   );
 };
 
-const ContainerAnswer = ({ text }) => {
-  return (
-    <div className="h-[80%] mx-auto pb-4">
-      <TextWithCode text={text} />
-    </div>
-  );
-};
+const ContainerAnswer = ({ text }) => (
+  <div className="h-[80%] mx-auto pb-4">
+    <TextWithCode text={text} />
+  </div>
+);
 
 export default ContainerAnswer;

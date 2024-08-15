@@ -4,11 +4,19 @@ const AImodels = {
   AI_models: [
     {
       id: 1,
-      name: "llama3-8b-8192",
+      name: "gemini-1.5-flash",
     },
     {
       id: 2,
-      name: "gemini-1.5-flash",
+      name: "gemini-1.5-pro",
+    },
+    {
+      id: 3,
+      name: "gemini-1.0-pro",
+    },
+    {
+      id: 4,
+      name: "llama3-8b-8192",
     },
   ],
 };

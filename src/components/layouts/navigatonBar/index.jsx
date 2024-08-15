@@ -28,7 +28,12 @@ const NavigationBar = () => {
             height={30}
           />
         </figure>
-        <h1 className="text-[22px] font-semibold">Joy AI</h1>
+        <div className="flex gap-2 ml-2">
+          <h1 className="text-[22px] font-semibold">Joy AI</h1>
+          <span className="text-[12px] text-right font-light text-gray-400">
+            v2.2.1
+          </span>
+        </div>
       </Link>
       <div className="w-[165px]">
         <Select
